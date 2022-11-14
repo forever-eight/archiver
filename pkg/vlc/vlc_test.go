@@ -1,7 +1,6 @@
 package vlc
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -50,71 +49,6 @@ func Test_encodeBin(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := encodeBin(tt.str); got != tt.want {
 				t.Errorf("encodeBin() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_splitByChunks(t *testing.T) {
-	type args struct {
-		bStr      string
-		chunkSize int
-	}
-	tests := []struct {
-		name string
-		args args
-		want binaryChunks
-	}{
-		{name: "basic case",
-			args: args{
-				bStr:      "1010101011111111",
-				chunkSize: 8,
-			},
-			want: binaryChunks{
-				binaryChunk("10101010"),
-				binaryChunk("11111111")},
-		}, {name: "left runes",
-			args: args{
-				bStr:      "001101001",
-				chunkSize: 8,
-			},
-			want: binaryChunks{
-				binaryChunk("00110100"),
-				binaryChunk("10000000"),
-			}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := splitByChunks(tt.args.bStr, tt.args.chunkSize); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("splitByChunks() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_binaryChunks_ToHex(t *testing.T) {
-	tests := []struct {
-		name string
-		bcs  binaryChunks
-		want hexChunks
-	}{
-		{
-			name: "basic case",
-			bcs:  binaryChunks{"1"},
-			want: hexChunks{"01"}},
-		{
-			name: "more interesting case",
-			bcs: binaryChunks{
-				binaryChunk("00110100"),
-				binaryChunk("10000000"),
-			},
-			want: hexChunks{"34", "80"},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.bcs.ToHex(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ToHex() = %v, want %v", got, tt.want)
 			}
 		})
 	}

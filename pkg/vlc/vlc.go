@@ -2,70 +2,9 @@ package vlc
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"unicode"
-	"unicode/utf8"
 )
-
-const chunkSize = 8
-
-type encodingTable map[rune]string
-
-type hexChunks []hexChunk
-type hexChunk string
-
-func (hcs hexChunks) ToString() string {
-	const sep = " "
-	switch len(hcs) {
-	case 0:
-		return ""
-	case 1:
-		return string(hcs[0])
-	}
-
-	var buf strings.Builder
-
-	// to avoid space at the end problem
-	buf.WriteString(string(hcs[0]))
-
-	for _, hc := range hcs[1:] {
-		buf.WriteString(" ")
-		buf.WriteString(string(hc))
-	}
-
-	return buf.String()
-}
-
-type binaryChunks []binaryChunk
-type binaryChunk string
-
-func (bcs binaryChunks) ToHex() hexChunks {
-	res := make(hexChunks, 0, len(bcs))
-
-	for _, c := range bcs {
-		// chunk -> hex chunk
-		hexC := c.ToHex()
-		res = append(res, hexC)
-	}
-
-	return res
-}
-
-func (bc binaryChunk) ToHex() hexChunk {
-	num, err := strconv.ParseUint(string(bc), 2, chunkSize)
-	if err != nil {
-		panic("parse int error:" + err.Error())
-	}
-	res := strings.ToUpper(fmt.Sprintf("%x", num))
-
-	// to fix len (1 -> 01)
-	if len(res) == 1 {
-		res = "0" + res
-	}
-
-	return hexChunk(res)
-}
 
 func Encode(str string) string {
 	// prepare text M -> !m
@@ -152,34 +91,16 @@ func getEncodingTable() encodingTable {
 
 }
 
-// splitByChunks splits binary string by chunks with given size
-// example: 1010101011010101 -> 10101010 11010101
-func splitByChunks(bStr string, chunkSize int) binaryChunks {
-	strLen := utf8.RuneCountInString(bStr)
-	chunksCount := strLen / chunkSize
+func Decode(encodedText string) string {
+	// hex chunks -> binary chunk
+	hexChunks := NewHexChunks(encodedText)
+	// bChunks -> binary string
+	binaryStrings := hexChunks.ToBinary()
+	fmt.Println(binaryStrings)
+	// build decoding tree
 
-	if strLen%chunkSize != 0 {
-		chunksCount++
-	}
+	// dTree(bString) -> text
 
-	res := make(binaryChunks, 0, chunksCount)
-
-	var buf strings.Builder
-	for i, s := range bStr {
-		buf.WriteString(string(s))
-
-		if (i+1)%chunkSize == 0 {
-			res = append(res, binaryChunk(buf.String()))
-			buf.Reset()
-		}
-	}
-
-	// if we have left runes
-	if buf.Len() != 0 {
-		lastChunk := buf.String()
-		// repeat 0 to last chunk how many times?
-		lastChunk += strings.Repeat("0", chunkSize-utf8.RuneCountInString(lastChunk))
-		res = append(res, binaryChunk(lastChunk))
-	}
-	return res
+	// return text
+	return ""
 }

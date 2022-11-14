@@ -14,14 +14,14 @@ import (
 
 const packedExtension = ".vlc"
 
-var vlcCmd = &cobra.Command{
+var vlcPackCmd = &cobra.Command{
 	Use:   "vlc",
 	Short: "Pack file with variable-length code",
 	Run:   pack,
 }
 
 func init() {
-	packCmd.AddCommand(vlcCmd)
+	packCmd.AddCommand(vlcPackCmd)
 }
 
 func pack(_ *cobra.Command, args []string) {
