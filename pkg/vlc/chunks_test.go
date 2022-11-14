@@ -114,3 +114,27 @@ func Test_hexChunk_ToBinary(t *testing.T) {
 		})
 	}
 }
+
+func TestHexChunks_ToBinary(t *testing.T) {
+	tests := []struct {
+		name string
+		hcs  HexChunks
+		want BinaryChunks
+	}{
+		{
+			name: "basic case",
+			hcs:  HexChunks{"34", "80"},
+			want: BinaryChunks{
+				binaryChunk("00110100"),
+				binaryChunk("10000000"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.hcs.ToBinary(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ToBinary() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
