@@ -1,7 +1,6 @@
 package vlc
 
 import (
-	"fmt"
 	"strings"
 	"unicode"
 )
@@ -33,6 +32,30 @@ func prepareText(str string) string {
 		} else {
 			buf.WriteRune(s)
 		}
+	}
+
+	return buf.String()
+}
+
+// example: !m -> M
+func exportText(str string) string {
+	var buf strings.Builder
+
+	var isCapital bool
+
+	for _, ch := range str {
+		if isCapital {
+			buf.WriteRune(unicode.ToUpper(ch))
+			isCapital = false
+
+			continue
+		}
+
+		if ch == '!' {
+			isCapital = true
+		}
+
+		buf.WriteRune(ch)
 	}
 
 	return buf.String()
@@ -94,13 +117,16 @@ func getEncodingTable() encodingTable {
 func Decode(encodedText string) string {
 	// hex chunks -> binary chunk
 	hexChunks := NewHexChunks(encodedText)
-	// bChunks -> binary string
+
+	// bChunks -> binary strings
 	binaryStrings := hexChunks.ToBinary()
-	fmt.Println(binaryStrings)
+
+	// binary strings -> string
+	str := binaryStrings.Join()
+
 	// build decoding tree
+	dTree := getEncodingTable().DecodingTree()
 
 	// dTree(bString) -> text
-
-	// return text
-	return ""
+	return exportText(dTree.Decode(str))
 }

@@ -133,3 +133,13 @@ func splitByChunks(bStr string, chunkSize int) BinaryChunks {
 	}
 	return res
 }
+
+// Join joins binary chunks and return as string
+func (bcs *BinaryChunks) Join() string {
+	var buf strings.Builder
+
+	for _, chunk := range *bcs {
+		buf.WriteString(string(chunk))
+	}
+	return buf.String()
+}
