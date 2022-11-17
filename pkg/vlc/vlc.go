@@ -5,7 +5,7 @@ import (
 	"unicode"
 )
 
-func Encode(str string) string {
+func Encode(str string) []byte {
 	// prepare text M -> !m
 	prepared := prepareText(str)
 
@@ -15,10 +15,8 @@ func Encode(str string) string {
 	// bits to bytes (8) 10101010 10110101 (split by chunks)
 	chunks := splitByChunks(bStr, chunkSize)
 
-	// bytes to hex (2C)
-
-	// return hexChunksStr
-	return chunks.ToHex().ToString()
+	// return bytes
+	return chunks.Bytes()
 }
 
 // prepareText prepares text to be fit to encode
@@ -114,15 +112,12 @@ func getEncodingTable() encodingTable {
 
 }
 
-func Decode(encodedText string) string {
+func Decode(encodedData []byte) string {
 	// hex chunks -> binary chunk
-	hexChunks := NewHexChunks(encodedText)
-
-	// bChunks -> binary strings
-	binaryStrings := hexChunks.ToBinary()
+	hexChunks := NewBinChunks(encodedData)
 
 	// binary strings -> string
-	str := binaryStrings.Join()
+	str := hexChunks.Join()
 
 	// build decoding tree
 	dTree := getEncodingTable().DecodingTree()

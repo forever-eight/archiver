@@ -1,6 +1,7 @@
 package vlc
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -61,17 +62,17 @@ func TestEncode(t *testing.T) {
 	tests := []struct {
 		name string
 		str  string
-		want string
+		want []byte
 	}{
 		{
 			name: "basic case",
 			str:  "hi",
-			want: "34 80",
+			want: []byte{52, 128},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := Encode(tt.str); got != tt.want {
+			if got := Encode(tt.str); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Encode() = %v, want %v", got, tt.want)
 			}
 		})
@@ -82,12 +83,12 @@ func TestDecode(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		encodedText string
+		encodedText []byte
 		want        string
 	}{
 		{
 			name:        "basic case",
-			encodedText: "34 80",
+			encodedText: []byte{52, 128},
 			want:        "hi",
 		},
 	}
